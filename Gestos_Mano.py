@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import copy
 import math
+import socket 
 
 cap_region_x_begin=0.5  
 cap_region_y_end=0.8  
@@ -12,6 +13,8 @@ temporalValue = 0
 contador_eventos = 0
 valor_angulo = 0
 
+#s.connect((host, port))
+envio = ''
 def printThreshold(thr):
     print("! Changed threshold to "+str(thr))
 
@@ -55,6 +58,9 @@ cv2.createTrackbar('trh1', 'Cambiar_thresold', threshold, 100, printThreshold)
 
 
 while camera.isOpened():
+    s = socket.socket()
+    host = '192.168.137.241'  # ip de raspberry
+    port = 8080
     ret, frame = camera.read()
     threshold = cv2.getTrackbarPos('trh1', 'Cambiar_thresold')
     frame = cv2.bilateralFilter(frame, 5, 50, 100)
@@ -109,21 +115,36 @@ while camera.isOpened():
                 temporalValue = cnt
 
         if valor_angulo == 0:
+            s.connect((host, port))
             angulo = 0
+            envio = 'servo1Dere'
+            s.send(envio) #se envia el valor al raspberry
+        
         elif valor_angulo == 1:
+            s.connect((host, port))
             angulo = 45
+            envio = 'servo2Dere'
+            s.send(envio) #se envia el valor al raspberry
         elif valor_angulo == 2:
+            s.connect((host, port))
             angulo = 60
-
+            envio = 'servo2Izq'
+            s.send(envio) #se envia el valor al raspberry
         elif valor_angulo == 3:
+            s.connect((host, port))
             angulo = 90
-
+            envio = 'servo1Centro'
+            s.send(envio) #se envia el valor al raspberry
         elif valor_angulo == 4:
+            s.connect((host, port))
             angulo = 100
-
+            envio = 'servo1Izq'
+            s.send(envio) #se envia el valor al raspberry
         elif valor_angulo == 5:
+            s.connect((host, port))
             angulo = 120
-
+            envio = 'servo2Centro'
+            s.send(envio) #se envia el valor al raspberry
         print("angulo:" + str(angulo))
         cv2.imshow('output', drawing)
 
@@ -140,4 +161,5 @@ while camera.isOpened():
         print '!!!Reset BackGround!!!'
 
 camera.release
+#s.close
 cv2.destroyAllWindows()
